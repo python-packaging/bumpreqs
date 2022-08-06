@@ -1,5 +1,16 @@
 # bumpreqs
 
+Usage
+
+```shell-session
+$ pip install bumpreqs
+$ python -m bumpreqs --write requirements*.txt
+```
+
+It will update the requirements to all use the latest versions.  It doesn't care
+about `requires_python` or really any other constraints.  Similar in that
+respect to dependabot or pyup, although it won't update to a pre unless it's
+already on a pre.
 
 
 # License
