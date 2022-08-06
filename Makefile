@@ -27,7 +27,7 @@ format:
 lint:
 	python -m ufmt check $(SOURCES)
 	python -m flake8 $(SOURCES)
-	mypy --strict bumpreqs
+	mypy --strict --install-types --non-interactive -p bumpreqs
 
 .PHONY: release
 release:
