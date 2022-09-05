@@ -8,6 +8,10 @@ from packaging.requirements import Requirement
 from packaging.specifiers import SpecifierSet
 from packaging.version import LegacyVersion, parse as parse_version, Version
 
+from .marker_extract import extract_python
+
+from .vrange import TooComplicated, VersionIntervals
+
 LOG = logging.getLogger(__name__)
 
 
@@ -39,6 +43,13 @@ def fix(text: str, force: Optional[bool] = False) -> str:
         req = Requirement(value)
         assert not req.url
 
+        try:
+            only_on_python = extract_python(req.marker)
+        except TooComplicated:
+            LOG.warning("Python version comparison too complex for %r", value)
+            new_lines.append(line)
+            continue
+
         # Only operate on `project` and `project==ver` for now.
         # Skip non-concrete specifiers in the hackiest way possible.
         if "==" not in line and any(x in line for x in "<>=~") and not force:
@@ -46,7 +57,7 @@ def fix(text: str, force: Optional[bool] = False) -> str:
             continue
 
         try:
-            releases = _fetch_versions(req.name)
+            releases = _fetch_versions(req.name, only_on_python)
         except Exception as e:
             LOG.warning("Failed to fetch versions for %r: %s", req.name, repr(e))
             new_lines.append(line)
@@ -82,8 +93,24 @@ def fix(text: str, force: Optional[bool] = False) -> str:
     return "".join(new_lines)
 
 
-def _fetch_versions(project_name: str) -> List[Union[LegacyVersion, Version]]:
+def _fetch_versions(
+    project_name: str,
+    only_for_python: Optional[VersionIntervals] = None,
+) -> List[Union[LegacyVersion, Version]]:
     resp = requests.get(f"https://pypi.org/pypi/{project_name}/json")
     resp.raise_for_status()
     obj = resp.json()
-    return [parse_version(v) for v in obj["releases"].keys()]
+
+    versions: List[Union[LegacyVersion, Version]] = []
+    for k, v in obj["releases"].items():
+        # Skip older releases that have no archives
+        if not v:
+            continue
+        requires_python = v[0].get("requires_python")
+        if requires_python and only_for_python:
+            if only_for_python.intersect(VersionIntervals.from_str(requires_python)):
+                versions.append(parse_version(k))
+        else:
+            versions.append(parse_version(k))
+
+    return versions
