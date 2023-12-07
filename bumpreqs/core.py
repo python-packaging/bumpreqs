@@ -6,7 +6,7 @@ import requests
 
 from packaging.requirements import Requirement
 from packaging.specifiers import SpecifierSet
-from packaging.version import LegacyVersion, parse as parse_version, Version
+from packaging.version import parse as parse_version, Version
 
 from .marker_extract import extract_python
 
@@ -96,12 +96,12 @@ def fix(text: str, force: Optional[bool] = False) -> str:
 def _fetch_versions(
     project_name: str,
     only_for_python: Optional[VersionIntervals] = None,
-) -> List[Union[LegacyVersion, Version]]:
+) -> List[Version]:
     resp = requests.get(f"https://pypi.org/pypi/{project_name}/json")
     resp.raise_for_status()
     obj = resp.json()
 
-    versions: List[Union[LegacyVersion, Version]] = []
+    versions: List[Version] = []
     for k, v in obj["releases"].items():
         # Skip older releases that have no archives
         if not v:
@@ -109,8 +109,10 @@ def _fetch_versions(
         requires_python = v[0].get("requires_python")
         if requires_python and only_for_python:
             if only_for_python.intersect(VersionIntervals.from_str(requires_python)):
+                # TODO try/except
                 versions.append(parse_version(k))
         else:
+            # TODO try/except
             versions.append(parse_version(k))
 
     return versions
