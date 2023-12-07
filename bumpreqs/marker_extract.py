@@ -1,6 +1,8 @@
 from typing import Any, Iterator, Optional, Tuple
 
-from packaging.markers import Marker, Variable
+from packaging._parser import Variable
+
+from packaging.markers import Marker
 
 from .vrange import TooComplicated, VersionIntervals
 
