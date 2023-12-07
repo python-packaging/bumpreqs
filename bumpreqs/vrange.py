@@ -117,11 +117,10 @@ class VersionIntervals:
 
     @classmethod
     def _intersect(self, other: EventList) -> EventList:
-
         new_events: EventList = []
         state = 0
         # Need "OUT" handled before "IN"
-        for (v, ev) in sorted(other, key=lambda i: (i[0], i[1])):
+        for v, ev in sorted(other, key=lambda i: (i[0], i[1])):
             old_state = state
             state += ev
             if state == 2:
@@ -140,11 +139,10 @@ class VersionIntervals:
 
     @classmethod
     def _union(self, other: EventList) -> EventList:
-
         new_events: EventList = []
         state = 0
         # Need "OUT" handled before "IN"
-        for (v, ev) in sorted(other, key=lambda i: (i[0], i[1])):
+        for v, ev in sorted(other, key=lambda i: (i[0], i[1])):
             old_state = state
             state += ev
             if state >= 1:
@@ -164,7 +162,7 @@ class VersionIntervals:
         if self._events == []:
             return "NONE"
 
-        for (v, ev) in self._events:
+        for v, ev in self._events:
             if (ev == IN and v == MIN) or (ev == OUT and v == MAX):
                 continue
 

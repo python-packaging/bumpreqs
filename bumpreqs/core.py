@@ -1,6 +1,6 @@
 import logging
 
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import requests
 

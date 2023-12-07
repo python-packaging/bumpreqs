@@ -16,6 +16,7 @@ CONVERSE_MAP = {
     ">=": "<",
 }
 
+
 # This is largely patterend after packaging/markers.py:_evaluate_markers
 # The  tuple is e.g. ("python_version", ">=", "3.0") and the version will always
 # be the last item.
@@ -48,7 +49,7 @@ def extract_python(markers: Optional[Marker]) -> Optional[VersionIntervals]:
     if markers is None:
         return None
 
-    for (var, op, value) in _extract_python_internal(markers._markers):
+    for var, op, value in _extract_python_internal(markers._markers):
         vi = vi.intersect(VersionIntervals.from_str(f"{op}{value}"))
 
     if vi == allow_all:
