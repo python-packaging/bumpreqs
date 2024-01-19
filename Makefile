@@ -28,7 +28,7 @@ lint:
 	python -m ufmt check $(SOURCES)
 	python -m flake8 $(SOURCES)
 	python -m checkdeps --allow-names bumpreqs bumpreqs
-	mypy --strict bumpreqs
+	mypy --strict --non-interactive bumpreqs
 
 .PHONY: release
 release:
