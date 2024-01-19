@@ -12,7 +12,7 @@ venv:
 
 .PHONY: setup
 setup:
-	python -m pip install -Ur requirements-dev.txt
+	python -m pip install -Ue .[dev,test]
 
 .PHONY: test
 test:
@@ -28,6 +28,7 @@ lint:
 	python -m ufmt check $(SOURCES)
 	python -m flake8 $(SOURCES)
 	mypy --strict --install-types --non-interactive -p bumpreqs
+	python -m checkdeps --allow-names bumpreqs bumpreqs
 
 .PHONY: release
 release:
